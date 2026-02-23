@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wanofi Cafe Menu</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 100px;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #9a3c09;
+      color: #eaeaea;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .animate-pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #4079ae 0%, #da770c 50%, #085071 100%);
+      color: #eaeaea;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      animation: slideInFromLeft 0.8s ease-out forwards;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(14, 160, 233, 0.992), transparent);
+      transition: left 0.7s;
+    }
+
+    header:hover::before {
+      left: 100%;
+    }
+
+    .logo {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      animation: bounceIn 1s ease-out forwards;
+      font-weight: bold;
+    }
+
+    .logo svg {
+      color: #e55934;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-style: italic;
+      animation: fadeIn 0.8s ease-out 0.5s forwards;
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      background: linear-gradient(135deg, #e55934 0%, #c73e1d 100%);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(52, 188, 229, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      padding-left: 20px;
+      box-shadow: 0 0 20px rgba(229, 89, 52, 0.5);
+    }
+
+    .sidebar-toggle.open {
+      transform: translateY(-50%) translateX(256px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 256px;
+      background: rgba(12, 94, 91, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      z-index: 150;
+      box-shadow: 4px 0 20px rgba(212, 8, 8, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      border-right: 1px solid rgba(229, 89, 52, 0.2);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-content {
+      padding: 24px;
+      padding-top: 80px;
+    }
+
+    .sidebar h3 {
+      color: #e55934;
+      margin-bottom: 16px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 140;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Quick navigation */
+    .quick-nav {
+      position: sticky;
+      top: 20px;
+      background-color: rgba(60, 140, 146, 0.95);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 20px rgba(23, 21, 21, 0.3);
+      z-index: 100;
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(229, 89, 52, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .quick-nav.hidden {
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
+    }
+
+    .quick-nav:hover {
+      box-shadow: 0 8px 25px rgba(229, 89, 52, 0.2);
+      transform: translateY(-3px);
+    }
+
+    .quick-nav.hidden:hover {
+      transform: translateY(-100%);
+    }
+
+    .quick-nav h3 {
+      color: #e55934;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 8px 12px;
+      background-color: rgba(229, 89, 52, 0.15);
+      border-radius: 20px;
+      text-decoration: none;
+      color: #eaeaea;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(229, 89, 52, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(52, 182, 229, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-link:hover::before {
+      left: 100%;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(229, 89, 52, 0.3);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 5px 15px rgba(229, 89, 52, 0.3);
+      color: #fff;
+    }
+
+    /* Menu section */
+    .menu-section {
+      margin-bottom: 40px;
+      background-color: rgba(11, 195, 228, 0.6);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(30px);
+      border: 1px solid rgba(52, 123, 229, 0.15);
+    }
+
+    .menu-section.animated {
+      animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      color: #eaeaea;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid rgba(229, 89, 52, 0.3);
+    }
+
+    .section-header:hover {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      padding-left: 25px;
+    }
+
+    .section-header svg {
+      color: #e55934;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .menu-items {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* Menu item */
+    .menu-item {
+      border: 2px solid rgba(6, 161, 188, 0.25);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: linear-gradient(145deg, rgba(165, 16, 3, 0.9) 0%, rgba(42, 121, 218, 0.927) 100%);
+      opacity: 0;
+      transform: translateY(20px);
+      box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(229, 89, 52, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgb(9, 148, 161) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .menu-item:hover::before {
+      opacity: 1;
+    }
+
+    .menu-item.animated {
+      animation: slideUp 0.5s ease-out forwards;
+    }
+
+    .menu-item:nth-child(1).animated { animation-delay: 0.1s; }
+    .menu-item:nth-child(2).animated { animation-delay: 0.2s; }
+    .menu-item:nth-child(3).animated { animation-delay: 0.3s; }
+    .menu-item:nth-child(4).animated { animation-delay: 0.4s; }
+    .menu-item:nth-child(5).animated { animation-delay: 0.5s; }
+    .menu-item:nth-child(6).animated { animation-delay: 0.6s; }
+
+    .menu-item:hover {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(229, 89, 52, 0.3),
+        0 0 0 2px rgba(229, 89, 52, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-color: #e55934;
+    }
+
+    .item-image {
+      height: 200px;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .item-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, transparent 0%, transparent 50%, rgba(15, 52, 96, 0.9) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .item-image::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(229, 89, 52, 0.2) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 3;
+    }
+
+    .menu-item:hover .item-image::after {
+      opacity: 1;
+    }
+
+    .item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      filter: brightness(0.9) saturate(1.1);
+    }
+
+    .menu-item:hover .item-image img {
+      transform: scale(1.15) rotate(2deg);
+      filter: brightness(1.1) saturate(1.2);
+    }
+
+    .item-content {
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(15, 52, 96, 0.5) 0%, rgba(22, 46, 62, 0.8) 100%);
+      transition: all 0.4s ease;
+      position: relative;
+      margin-top: -30px;
+      z-index: 5;
+    }
+
+    .menu-item:hover .item-content {
+      background: linear-gradient(180deg, rgba(15, 52, 96, 0.7) 0%, rgba(22, 33, 62, 0.95) 100%);
+    }
+
+    .item-content h4 {
+      color: #fff;
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-item:hover .item-content h4 {
+      color: #e55934;
+      transform: translateX(5px);
+      text-shadow: 0 2px 8px rgba(229, 89, 52, 0.3);
+    }
+
+    .item-content p {
+      color: rgba(234, 234, 234, 0.85);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      min-height: 40px;
+      transition: all 0.3s ease;
+      line-height: 1.5;
+    }
+
+    .menu-item:hover .item-content p {
+      color: #eaeaea;
+    }
+
+    .price {
+      font-weight: 800;
+      color: #fff;
+      font-size: 1.4rem;
+      margin-top: 12px;
+      text-align: right;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(229, 89, 52, 0.3) 0%, rgba(199, 62, 29, 0.4) 100%);
+      border: 1px solid rgba(229, 89, 52, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-item:hover .price {
+      color: #fff;
+      transform: scale(1.1) translateY(-2px);
+      background: linear-gradient(135deg, #e55934 0%, #c73e1d 100%);
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(229, 89, 52, 0.5);
+    }
+
+    .item-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(52, 126, 229, 0.15) 0%, rgba(48, 142, 201, 0.2) 100%);
+      color: rgba(234, 234, 234, 0.9);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 8px;
+      margin-right: 8px;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(229, 89, 52, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-item:hover .item-tag {
+      background: linear-gradient(135deg, rgba(100, 193, 207, 0.949) 0%, rgba(29, 176, 199, 0.4) 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 4px 10px rgba(229, 89, 52, 0.2);
+      border-color: rgba(229, 89, 52, 0.4);
+    }
+
+    /* Sub-section */
+    .sub-section {
+      grid-column: 1 / -1;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(240, 230, 214, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .sub-section.animated {
+      animation: slideUp 0.6s ease-out forwards;
+    }
+
+    .sub-section h3 {
+      color: #eaeaea;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      padding-left: 10px;
+      border-left: 4px solid #e55934;
+      transition: all 0.3s ease;
+    }
+
+    .sub-section:hover h3 {
+      padding-left: 15px;
+      color: #e55934;
+    }
+
+    .sub-section-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 25px;
+      margin-top: 40px;
+      color: #e7e6e5;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(224, 208, 184, 0.3);
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    .highlight {
+      color: #e55934;
+      font-weight: bold;
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #e55934 0%, #c73e1d 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(229, 89, 52, 0.4);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      border: none;
+      pointer-events: none;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .menu-items, .sub-section-items {
+        grid-template-columns: 1fr;
+      }
+
+      .logo {
+        font-size: 2.2rem;
+      }
+
+      .nav-links {
+        gap: 5px;
+      }
+
+      .nav-link {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      .scroll-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .menu-items, .sub-section-items {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar toggle button -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="menuIcon">
+        <line x1="4" x2="20" y1="12" y2="12"></line>
+        <line x1="4" x2="20" y1="6" y2="6"></line>
+        <line x1="4" x2="20" y1="18" y2="18"></line>
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="closeIcon" style="display: none;">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e55934" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse">
+            <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+            <line x1="6" x2="6" y1="2" y2="4"></line>
+            <line x1="10" x2="10" y1="2" y2="4"></line>
+            <line x1="14" x2="14" y1="2" y2="4"></line>
+          </svg>
+          Jump to Section
+        </h3>
+        <nav id="sidebarNav"></nav>
+      </div>
+    </div>
+
+    <!-- Sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e55934" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-float">
+          <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+          <line x1="6" x2="6" y1="2" y2="4"></line>
+          <line x1="10" x2="10" y1="2" y2="4"></line>
+          <line x1="14" x2="14" y1="2" y2="4"></line>
+        </svg>
+        <span>wanofi</span>
+      </div>
+      <p class="tagline">Delicious food & drinks with mouth-watering photos</p>
+    </header>
+
+    <!-- Quick navigation -->
+    <div class="quick-nav" id="quickNav">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e55934" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse">
+          <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+          <line x1="6" x2="6" y1="2" y2="4"></line>
+          <line x1="10" x2="10" y1="2" y2="4"></line>
+          <line x1="14" x2="14" y1="2" y2="4"></line>
+        </svg>
+        Jump to Section:
+      </h3>
+      <div class="nav-links" id="navLinks"></div>
+    </div>
+
+    <!-- Menu sections will be inserted here -->
+    <div id="menuContainer"></div>
+
+    <!-- Footer -->
+    <footer>
+      <p>Visit us at our location: <span class="highlight">sare bet, Addis Ababa</span> </p>
+      <p>Call us: +251 911 234 567 </p>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m18 15-6-6-6 6"></path>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // Menu Data
+    const menuData = {
+      coffee: {
+        title: "Coffee & Tea",
+        icon: "coffee",
+        subsections: [
+          {
+            title: "Hot Drinks",
+            items: [
+              { name: "Tea", price: 60 },
+              { name: "Green Tea", price: 70 },
+              { name: "Lemon Tea", price: 80 },
+              { name: "Milk", price: 105 },
+              { name: "Hot Chocolate", price: 190 },
+              { name: "Cappuccino", price: 220 },
+              { name: "Double Espresso", price: 250 },
+            ],
+          },
+          {
+            title: "Ice Drinks",
+            items: [
+              { name: "Ice Tea", price: 250 },
+              { name: "Ice Coffee", price: 320 },
+              { name: "Ice Late", price: 350 },
+            ],
+          },
+        ],
+      },
+      cakes: {
+        title: "Cakes & Cookies",
+        icon: "cake",
+        subsections: [
+          {
+            title: "Cakes",
+            items: [
+              { name: "Banana Bread", price: 180 },
+              { name: "Carrot Cakes", price: 180 },
+              { name: "English Cakes", price: 180 },
+              { name: "Muffins", price: 180 },
+              { name: "Marble Cake", price: 180 },
+              { name: "Chocolate Lava", price: 400 },
+              { name: "Brownie", price: 380 },
+            ],
+          },
+          {
+            title: "Cookies",
+            items: [
+              { name: "K. Cookies", price: "250 (100mg) / 180 (50mg)" },
+              { name: "Cookies", price: "250 / 180" },
+              { name: "Mixed Cookies", price: 250 },
+            ],
+          },
+        ],
+      },
+      juices: {
+        title: "Juices & Smoothies",
+        icon: "glass-water",
+        subsections: [
+          {
+            title: "Juices",
+            items: [
+              { name: "Mixed Juice", price: 400 },
+              { name: "Orange Juice", price: 380 },
+              { name: "Avocado Juice", price: 320 },
+              { name: "Mango Juice", price: 320 },
+              { name: "Watermelon Juice", price: 320 },
+            ],
+          },
+          {
+            title: "Smoothies",
+            items: [
+              { name: "Strawberry Smoothie", price: 300 },
+              { name: "Vanilla Smoothie", price: 300 },
+              { name: "Chocolate Smoothie", price: 300 },
+            ],
+          },
+        ],
+      },
+      sandwiches: {
+        title: "Sandwiches & Wraps",
+        icon: "sandwich",
+        items: [
+          { name: "Egg Sandwich", description: "Onion, Tomato, Chili and Egg", price: 380 },
+          { name: "Avocado Sandwich", description: "Avocado, Onion, Tomato and Chili", price: 480 },
+          { name: "Chicken Sandwich / Wrap", description: "Chicken, Onion and Cheese", price: 800, tag: "Wrap Available" },
+          { name: "Tuna Sandwich", description: "Tuna, Tomato, Onion, Chili and Cucumber", price: 800 },
+          { name: "Vegetable Sandwich with Cheese", description: "Carrot, Onion, Spinach Cheese, Lettuce, Broccoli, Corn Fowler & Chili", price: 650 },
+          { name: "Beef Sandwich / Wrap", description: "Beef, Onion and Cheese", price: 700, tag: "Wrap Available" },
+          { name: "Vegetable Sandwich", description: "Carrot, Onion, Spinach, Lettuce, Broccoli, Corn Fowler & Chili", price: 500 },
+          { name: "Club Sandwich", description: "Chicken, Lettuce, Carrot, Onion, Cheese, Egg and Tomato", price: 1100 },
+        ],
+      },
+      burgers: {
+        title: "Burgers",
+        icon: "utensils",
+        items: [
+          { name: "Normal Burger", description: "Onion, Beef, Tomato, Salad, Green Pepper", price: 750 },
+          { name: "Cheese Burger", description: "Cheese, Beef, Onion, Lettuce, Tomato, Green Pepper", price: 900 },
+          { name: "Special Burger", description: "Egg, Onion, Tomato, Green Pepper, Beef, Chicken, Mortadella Cheese", price: 1100 },
+          { name: "Double Cheese Burger", description: "Double Cheese, Beef, Onion, Lettuce, Tomato, Green Pepper", price: 1000 },
+          { name: "Double Beef Burger", description: "Double Beef, Onion, Tomato, Salad, Green Pepper", price: 1200 },
+        ],
+      },
+      pizza: {
+        title: "Pizza",
+        icon: "pizza",
+        items: [
+          { type: "Beef Pizza", large: 1200, medium: 1100, small: 900 },
+          { type: "Cheese Pizza", large: 1000, medium: 900, small: 800 },
+          { type: "Veggie Pizza", large: 1000, medium: 900, small: 800 },
+          { type: "Chicken Pizza", large: 1200, medium: 1100, small: 900 },
+          { type: "Tuna Pizza", large: 1200, medium: 1100, small: "-" },
+          { type: "Special Pizza", large: 1400, medium: "-", small: "-" },
+        ],
+      },
+      salads: {
+        title: "Salads & Soups",
+        icon: "salad",
+        items: [
+          { name: "Mixed Salad", description: "Tomato, Onion, Carrot, Cucumber, Chili and Lettuce", price: 500 },
+          { name: "Chicken Salad", description: "Chicken, Tomato, Onion, Cucumber and Carrot", price: 800 },
+          { name: "Tuna Salad", description: "Tuna, Tomato, Onion, Lettuce and Chili", price: 900 },
+          { name: "Chicken Soup", description: "Chicken Cream and Bechamel Sauce", price: 700 },
+        ],
+      },
+      drinks: {
+        title: "Soft Drinks",
+        icon: "wine",
+        items: [
+          { name: "Novada", price: 100 },
+          { name: "Ambo Mineral Water", price: 95 },
+          { name: "Soft Drink", description: "Coke, Sprite, Fanta", price: 85 },
+          { name: "Water", price: 60 },
+        ],
+      },
+      special: {
+        title: "Special Menu",
+        icon: "star",
+        items: [
+          { name: "Chechebsa with Salad", description: "Tef, Tomato, Chili, Onion, Avocado and Lettuce", price: 500 },
+          { name: "Special Chechebsa", description: "Tef, Egg and Honey", price: 600 },
+          { name: "Wanofi Lantate", description: "", price: 500 },
+          { name: "Wanofi Oats Lantate", description: "Flour, Meat", price: 650 },
+          { name: "Special Oats Lantate", description: "Oats Flour, Meat, Egg", price: 700 },
+        ],
+      },
+    };
+
+    // Image URLs
+    const imageMap = {
+      burgers: {
+        "Normal Burger": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+        "Cheese Burger": "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=600&q=80",
+        "Special Burger": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=600&q=80",
+        "Double Cheese Burger": "https://images.unsplash.com/photo-1596662951482-0c4ba74a6df6?auto=format&fit=crop&w=600&q=80",
+        "Double Beef Burger": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80",
+      },
+      pizza: {
+        "Beef Pizza": "https://images.unsplash.com/photo-1595708684082-a173bb3a06c5?auto=format&fit=crop&w=600&q=80",
+        "Cheese Pizza": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?auto=format&fit=crop&w=600&q=80",
+        "Veggie Pizza": "https://images.unsplash.com/photo-1593246049226-ded77bf90326?auto=format&fit=crop&w=600&q=80",
+        "Chicken Pizza": "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80",
+        "Tuna Pizza": "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?auto=format&fit=crop&w=600&q=80",
+        "Special Pizza": "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=600&q=80",
+      },
+      sandwiches: {
+        "Egg Sandwich": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80",
+        "Avocado Sandwich": "https://images.unsplash.com/photo-1524338198850-8a2ff63aaceb?auto=format&fit=crop&w=600&q=80",
+        "Chicken Sandwich / Wrap": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
+        "Tuna Sandwich": "https://images.unsplash.com/photo-1559054663-e8d23213f55c?auto=format&fit=crop&w=600&q=80",
+        "Vegetable Sandwich with Cheese": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+        "Beef Sandwich / Wrap": "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?auto=format&fit=crop&w=600&q=80",
+        "Vegetable Sandwich": "https://images.unsplash.com/photo-1481070555726-e2fe8357725c?auto=format&fit=crop&w=600&q=80",
+        "Club Sandwich": "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=600&q=80",
+      },
+      salads: {
+        "Mixed Salad": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+        "Chicken Salad": "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?auto=format&fit=crop&w=600&q=80",
+        "Tuna Salad": "https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=600&q=80",
+        "Chicken Soup": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=600&q=80",
+      },
+      special: {
+        "Chechebsa with Salad": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80",
+        "Special Chechebsa": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",
+        "Wanofi Lantate": "https://images.unsplash.com/photo-1555507036-ab794f27d2e9?auto=format&fit=crop&w=600&q=80",
+        "Wanofi Oats Lantate": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80",
+        "Special Oats Lantate": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=600&q=80",
+      },
+      cakes: {
+        "Banana Bread": "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=600&q=80",
+        "Carrot Cakes": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80",
+        "English Cakes": "https://images.unsplash.com/photo-1608231387040-848b4d0c8d68?auto=format&fit=crop&w=600&q=80",
+        "Muffins": "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=600&q=80",
+        "Marble Cake": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=600&q=80",
+        "Brownie": "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?auto=format&fit=crop&w=600&q=80",
+        "Chocolate Lava": "https://images.unsplash.com/photo-1623334044303-241021148842?auto=format&fit=crop&w=600&q=80",
+      },
+      coffee: {
+        "Tea": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80",
+        "Green Tea": "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?auto=format&fit=crop&w=600&q=80",
+        "Lemon Tea": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80",
+        "Milk": "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=600&q=80",
+        "Hot Chocolate": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80",
+        "Cappuccino": "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=600&q=80",
+        "Double Espresso": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80",
+      },
+      juices: {
+        "Mixed Juice": "https://images.unsplash.com/photo-1600271886742-f049cd5bb8fe?auto=format&fit=crop&w=600&q=80",
+        "Orange Juice": "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=600&q=80",
+        "Avocado Juice": "https://images.unsplash.com/photo-1621939514649-280df2f3d65f?auto=format&fit=crop&w=600&q=80",
+      },
+      drinks: {
+        "Novada": "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=80",
+        "Ambo Mineral Water": "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=600&q=80",
+        "Soft Drink": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80",
+        "Water": "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=600&q=80",
+      },
+    };
+
+    const fallbackImages = {
+      burgers: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+      pizza: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",
+      sandwiches: "https://images.unsplash.com/photo-1485451456034-3f9391c6f769?auto=format&fit=crop&w=600&q=80",
+      salads: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+      special: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",
+      cakes: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=600&q=80",
+      coffee: "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=600&q=80",
+      juices: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=600&q=80",
+      drinks: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=80",
+    };
+
+    // Icon SVGs
+    const icons = {
+      coffee: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" x2="6" y1="2" y2="4"></line><line x1="10" x2="10" y1="2" y2="4"></line><line x1="14" x2="14" y1="2" y2="4"></line></svg>',
+      cake: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M2 21h20"></path><path d="M7 8v2"></path><path d="M12 8v2"></path><path d="M17 8v2"></path><path d="M7 4h.01"></path><path d="M12 4h.01"></path><path d="M17 4h.01"></path></svg>',
+      'glass-water': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"></path><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"></path></svg>',
+      sandwich: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3"></path><path d="M12 19H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-3.83"></path><path d="m3 11 7.77-6.04a2 2 0 0 1 2.46 0L21 11H3Z"></path><path d="M12.97 19.77 7 15h12.5l-3.75 4.5a2 2 0 0 1-2.78.27Z"></path></svg>',
+      utensils: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>',
+      pizza: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"></path><path d="M11 15h.01"></path><path d="M16 16h.01"></path><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"></path><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"></path></svg>',
+      salad: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10"></path><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path><path d="M11.38 12a2.4 2.4 0 0 1-.4-4.77 2.4 2.4 0 0 1 3.2-2.77 2.4 2.4 0 0 1 3.47-.63 2.4 2.4 0 0 1 3.37 3.37 2.4 2.4 0 0 1-1.1 3.7 2.51 2.51 0 0 1 .03 1.1"></path><path d="m13 12 4-4"></path><path d="M10.9 7.25A2.4 2.4 0 0 0 5 8a2.4 2.4 0 0 0 1 4"></path></svg>',
+      wine: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"></path><path d="M7 10h10"></path><path d="M12 15v7"></path><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"></path></svg>',
+      star: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+    };
+
+    function getImageUrl(category, itemName) {
+      if (category === "cakes" && itemName.includes("Cookies")) {
+        return "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=600&q=80";
+      }
+      if (itemName.includes("Smoothie")) {
+        return "https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=600&q=80";
+      }
+      if (itemName.includes("Ice")) {
+        return "https://images.unsplash.com/photo-1568649929103-28ffbefaca1e?auto=format&fit=crop&w=600&q=80";
+      }
+      if (imageMap[category] && imageMap[category][itemName]) {
+        return imageMap[category][itemName];
+      }
+      return fallbackImages[category] || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80";
+    }
+
+    // Generate navigation links
+    function generateNavLinks() {
+      const navLinks = document.getElementById('navLinks');
+      const sidebarNav = document.getElementById('sidebarNav');
+      
+      Object.keys(menuData).forEach(key => {
+        const section = menuData[key];
+        
+       
+        // Sidebar nav link
+        const sidebarLink = document.createElement('button');
+        sidebarLink.className = 'nav-link';
+        sidebarLink.innerHTML = `${icons[section.icon]} ${section.title}`;
+        sidebarLink.onclick = () => {
+          scrollToSection(key);
+          closeSidebar();
+        };
+        sidebarNav.appendChild(sidebarLink);
+      });
+    }
+
+    // Generate menu sections
+    function generateMenuSections() {
+      const container = document.getElementById('menuContainer');
+      
+      Object.keys(menuData).forEach(key => {
+        const section = menuData[key];
+        const sectionEl = document.createElement('div');
+        sectionEl.className = 'menu-section';
+        sectionEl.id = key;
+        
+        let itemsHTML = '';
+        
+        if (key === 'pizza') {
+          section.items.forEach(item => {
+            itemsHTML += `
+              <div class="menu-item">
+                <div class="item-image">
+                  <img src="${getImageUrl('pizza', item.type)}" alt="${item.type}" loading="lazy" crossorigin="anonymous">
+                </div>
+                <div class="item-content">
+                  <h4>${item.type}</h4>
+                  <p>Large: ${item.large} ETB | Medium: ${item.medium} ETB | Small: ${item.small}${item.small !== '-' ? ' ETB' : ''}</p>
+                </div>
+              </div>
+            `;
+          });
+        } else if (section.subsections) {
+          section.subsections.forEach(subsection => {
+            itemsHTML += `
+              <div class="sub-section">
+                <h3>${subsection.title}</h3>
+                <div class="sub-section-items">
+                  ${subsection.items.map(item => `
+                    <div class="menu-item">
+                      <div class="item-image">
+                        <img src="${getImageUrl(key, item.name)}" alt="${item.name}" loading="lazy" crossorigin="anonymous">
+                      </div>
+                      <div class="item-content">
+                        <h4>${item.name}</h4>
+                        <span class="price">${typeof item.price === 'number' ? `${item.price} ETB` : item.price}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          section.items.forEach(item => {
+            itemsHTML += `
+              <div class="menu-item">
+                <div class="item-image">
+                  <img src="${getImageUrl(key, item.name)}" alt="${item.name}" loading="lazy" crossorigin="anonymous">
+                </div>
+                <div class="item-content">
+                  <h4>${item.name}</h4>
+                  <p>${item.description || ''}</p>
+                  ${item.tag ? `<span class="item-tag">${item.tag}</span>` : ''}
+                  <span class="price">${item.price} ETB</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+        
+        sectionEl.innerHTML = `
+          <div class="section-header">
+            ${icons[section.icon]}
+            <h2>${section.title}</h2>
+          </div>
+          <div class="menu-items">
+            ${itemsHTML}
+          </div>
+        `;
+        
+        container.appendChild(sectionEl);
+      });
+    }
+
+    // Scroll functions
+    function scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        window.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Sidebar functions
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('sidebarToggle').classList.add('open');
+      document.getElementById('sidebarOverlay').classList.add('visible');
+      document.getElementById('menuIcon').style.display = 'none';
+      document.getElementById('closeIcon').style.display = 'block';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarToggle').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('visible');
+      document.getElementById('menuIcon').style.display = 'block';
+      document.getElementById('closeIcon').style.display = 'none';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      generateNavLinks();
+      generateMenuSections();
+
+      // Sidebar toggle
+      document.getElementById('sidebarToggle').addEventListener('click', function() {
+        if (document.getElementById('sidebar').classList.contains('open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+
+      // Overlay click to close
+      document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+
+      // Scroll to top button
+      document.getElementById('scrollTop').addEventListener('click', scrollToTop);
+
+      // Scroll detection
+      let lastScrollY = 0;
+      const quickNav = document.getElementById('quickNav');
+      const scrollTopBtn = document.getElementById('scrollTop');
+
+      window.addEventListener('scroll', function() {
+        const currentScrollY = window.scrollY;
+        
+        // Show/hide scroll to top button
+        if (currentScrollY > 300) {
+          scrollTopBtn.classList.add('visible');
+        } else {
+          scrollTopBtn.classList.remove('visible');
+        }
+        
+        // Hide/show quick nav based on scroll direction
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          quickNav.classList.add('hidden');
+        } else {
+          quickNav.classList.remove('hidden');
+        }
+        
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+
+      // Intersection Observer for animations
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      };
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animated');
+            
+            setTimeout(function() {
+              const menuItems = entry.target.querySelectorAll('.menu-item');
+              menuItems.forEach(function(item, index) {
+                setTimeout(function() {
+                  item.classList.add('animated');
+                }, index * 50);
+              });
+              
+              const subSections = entry.target.querySelectorAll('.sub-section');
+              subSections.forEach(function(subSection, index) {
+                setTimeout(function() {
+                  subSection.classList.add('animated');
+                }, index * 200);
+              });
+            }, 100);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.menu-section').forEach(function(section) {
+        observer.observe(section);
+      });
+    });
+  </script>
+</body>
+</html>
